@@ -351,6 +351,8 @@ select {
 .feature-card h3 {
   margin: 0 0 14px;
   font-size: 1.02rem;
+  position: relative;
+  z-index: 1;
 }
 
 .feature-card ul {
@@ -360,6 +362,8 @@ select {
   gap: 10px;
   color: var(--muted);
   line-height: 1.55;
+  position: relative;
+  z-index: 1;
 }
 
 .feature-card.tone-amber::before {
@@ -376,6 +380,50 @@ select {
 
 .feature-card.tone-slate::before {
   background: radial-gradient(circle at top right, rgba(148, 163, 184, 0.28), transparent 55%);
+}
+
+.feature-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  animation: iconFloat 4.8s ease-in-out infinite;
+}
+
+.feature-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.feature-icon-pulse {
+  color: #f59e0b;
+}
+
+.feature-icon-radar {
+  color: #38bdf8;
+  animation-delay: 0.5s;
+}
+
+.feature-icon-shield {
+  color: #22c55e;
+  animation-delay: 1s;
+}
+
+.feature-icon-map {
+  color: #cbd5e1;
+  animation-delay: 1.5s;
 }
 
 .alert {
@@ -460,6 +508,47 @@ select {
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 44px 44px;
   opacity: 0.45;
+}
+
+.map-legend {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 3;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(7, 13, 22, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-high {
+  background: #ff4d4d;
+}
+
+.legend-mid {
+  background: #f59e0b;
+}
+
+.legend-low {
+  background: #22c55e;
 }
 
 .uk-silhouette {
@@ -937,5 +1026,14 @@ select {
   }
   50% {
     transform: translate(-50%, -50%) translateY(-6px);
+  }
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(-2deg);
   }
 }

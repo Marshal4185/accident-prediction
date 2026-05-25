@@ -56,6 +56,36 @@ function Metric({ label, value, subtext }) {
   );
 }
 
+function FeatureIcon({ kind }) {
+  const icons = {
+    pulse: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 12h4l2-5 3 10 2-5h7" />
+      </svg>
+    ),
+    radar: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="8" />
+        <path d="M12 4v8l5 5" />
+      </svg>
+    ),
+    shield: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3 4 6v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V6l-8-3z" />
+        <path d="m9.5 12 1.8 1.8 3.7-4.2" />
+      </svg>
+    ),
+    map: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6l-6-2z" />
+        <path d="M9 4v13M15 6v13" />
+      </svg>
+    ),
+  };
+
+  return <span className={`feature-icon feature-icon-${kind}`}>{icons[kind]}</span>;
+}
+
 function App() {
   const [options, setOptions] = useState(null);
   const [summary, setSummary] = useState(null);
@@ -157,6 +187,7 @@ function App() {
     {
       title: "Risk prediction",
       tone: "amber",
+      icon: "pulse",
       items: [
         "Real-time accident risk prediction",
         "Visual risk probability meters",
@@ -167,6 +198,7 @@ function App() {
     {
       title: "Live monitoring",
       tone: "blue",
+      icon: "radar",
       items: [
         "Live weather integration",
         "Simulated live GPS vehicle tracking",
@@ -177,6 +209,7 @@ function App() {
     {
       title: "Safety response",
       tone: "green",
+      icon: "shield",
       items: [
         "AI voice alert for drivers",
         "AI-powered safety recommendations",
@@ -187,6 +220,7 @@ function App() {
     {
       title: "Mapping and reports",
       tone: "slate",
+      icon: "map",
       items: [
         "Interactive UK accident hotspot maps",
         "Dynamic map visualization with Folium",
@@ -376,6 +410,7 @@ function App() {
         <div className="feature-grid">
           {featureBlocks.map((block) => (
             <article key={block.title} className={`feature-card tone-${block.tone}`}>
+              <FeatureIcon kind={block.icon} />
               <h3>{block.title}</h3>
               <ul>
                 {block.items.map((item) => (
@@ -409,6 +444,11 @@ function App() {
 
             <div className="uk-map" aria-label="stylized UK hotspot map">
               <div className="uk-silhouette" />
+              <div className="map-legend">
+                <span><i className="legend-dot legend-high" /> High</span>
+                <span><i className="legend-dot legend-mid" /> Mid</span>
+                <span><i className="legend-dot legend-low" /> Low</span>
+              </div>
               {hotspotZones.map((zone, index) => (
                 <div
                   key={zone.name}

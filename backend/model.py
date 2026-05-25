@@ -13,8 +13,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
-from .data import FEATURE_COLUMNS, TARGET_COLUMN, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS, load_frame
-from .settings import ARTIFACT_DIR, METADATA_PATH, MODEL_PATH
+try:  # pragma: no cover - supports Render's top-level module mode
+    from .data import FEATURE_COLUMNS, TARGET_COLUMN, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS, load_frame
+    from .settings import ARTIFACT_DIR, METADATA_PATH, MODEL_PATH
+except ImportError:  # pragma: no cover
+    from data import FEATURE_COLUMNS, TARGET_COLUMN, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS, load_frame
+    from settings import ARTIFACT_DIR, METADATA_PATH, MODEL_PATH
 
 
 def _build_pipeline() -> Pipeline:

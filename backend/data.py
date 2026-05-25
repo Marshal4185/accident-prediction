@@ -6,7 +6,10 @@ from typing import Any
 
 import pandas as pd
 
-from .settings import ARTIFACT_DIR, DATA_PATH, OPTIONS_PATH, SUMMARY_PATH
+try:  # pragma: no cover - supports both package and top-level imports on hosts like Render
+    from .settings import ARTIFACT_DIR, DATA_PATH, OPTIONS_PATH, SUMMARY_PATH
+except ImportError:  # pragma: no cover
+    from settings import ARTIFACT_DIR, DATA_PATH, OPTIONS_PATH, SUMMARY_PATH
 
 
 TARGET_COLUMN = "Accident_Severity"

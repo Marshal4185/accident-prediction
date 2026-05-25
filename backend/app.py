@@ -3,9 +3,14 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .data import load_options, load_summary
-from .model import load_metadata, predict_severity, train_model
-from .schemas import PredictionRequest
+try:  # pragma: no cover - supports both `backend.app` and top-level `app`
+    from .data import load_options, load_summary
+    from .model import load_metadata, predict_severity, train_model
+    from .schemas import PredictionRequest
+except ImportError:  # pragma: no cover
+    from data import load_options, load_summary
+    from model import load_metadata, predict_severity, train_model
+    from schemas import PredictionRequest
 
 
 app = FastAPI(title="AI Road Accident Prediction")

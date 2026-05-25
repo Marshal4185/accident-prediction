@@ -95,6 +95,16 @@ function App() {
   const topWeather = useMemo(() => Object.entries(summary?.weather_counts || {}).slice(0, 4), [summary]);
   const topRoadTypes = useMemo(() => Object.entries(summary?.road_type_counts || {}).slice(0, 4), [summary]);
   const topVehicles = useMemo(() => Object.entries(summary?.vehicle_type_counts || {}).slice(0, 4), [summary]);
+  const hotspotZones = useMemo(
+    () => [
+      { name: "London", risk: 92, note: "Dense traffic and frequent junction conflicts" },
+      { name: "Manchester", risk: 81, note: "High vehicle interaction and mixed road types" },
+      { name: "Birmingham", risk: 76, note: "Busy corridors with varied surface conditions" },
+      { name: "Leeds", risk: 68, note: "Urban intersections with weather exposure" },
+      { name: "Glasgow", risk: 63, note: "Fast-changing lighting and road conditions" },
+    ],
+    []
+  );
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -183,6 +193,29 @@ function App() {
         "Automated downloadable reports",
         "Accident zone review workflow",
       ],
+    },
+  ];
+
+  const liveTiles = [
+    {
+      title: "Weather",
+      value: summary ? Object.keys(summary.weather_counts || {})[0] || "Stable" : "Loading",
+      detail: "Current environment snapshot",
+    },
+    {
+      title: "GPS tracking",
+      value: "Active",
+      detail: "Simulated moving vehicle monitoring",
+    },
+    {
+      title: "Danger zone",
+      value: result ? result.predicted_severity : "Standby",
+      detail: "Alert status based on current scenario",
+    },
+    {
+      title: "Voice alert",
+      value: "Ready",
+      detail: "Browser speech output available",
     },
   ];
 
@@ -351,6 +384,80 @@ function App() {
               </ul>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="monitoring-section">
+        <div className="section-heading">
+          <p className="section-kicker">Live operations</p>
+          <h2>Monitoring and response</h2>
+          <p>
+            A dedicated safety panel for weather awareness, location monitoring, high-risk alerts,
+            and response actions.
+          </p>
+        </div>
+
+        <div className="monitor-grid">
+          <div className="monitor-panel map-panel">
+            <div className="map-header">
+              <div>
+                <h3>UK accident hotspot map</h3>
+                <p>Highlighted areas reflect where risk concentrates most heavily.</p>
+              </div>
+              <span className="map-badge">High risk highlighted</span>
+            </div>
+
+            <div className="uk-map" aria-label="stylized UK hotspot map">
+              <div className="uk-silhouette" />
+              {hotspotZones.map((zone, index) => (
+                <div
+                  key={zone.name}
+                  className="map-pin"
+                  style={{
+                    ["--pin-top"]: `${12 + index * 13}%`,
+                    ["--pin-left"]: `${18 + (index % 3) * 17}%`,
+                    ["--pin-delay"]: `${index * 0.25}s`,
+                  }}
+                >
+                  <span className="pin-dot" />
+                  <div className="pin-label">
+                    <strong>{zone.name}</strong>
+                    <span>{zone.risk}% risk</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="monitor-panel">
+            <div className="mini-panel live-strip">
+              <h3>Live status</h3>
+              <div className="live-grid">
+                {liveTiles.map((tile) => (
+                  <div key={tile.title} className="live-tile">
+                    <span>{tile.title}</span>
+                    <strong>{tile.value}</strong>
+                    <p>{tile.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mini-panel">
+              <h3>Hotspot ranking</h3>
+              <div className="hotspot-list">
+                {hotspotZones.map((zone) => (
+                  <div key={zone.name} className="hotspot-row">
+                    <div>
+                      <strong>{zone.name}</strong>
+                      <span>{zone.note}</span>
+                    </div>
+                    <div className="hotspot-score">{zone.risk}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

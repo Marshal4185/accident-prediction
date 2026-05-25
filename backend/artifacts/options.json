@@ -1,0 +1,109 @@
+{
+  "months": [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ],
+  "days_of_week": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ],
+  "junction_control": [
+    "Authorised person",
+    "Auto traffic signal",
+    "Data missing or out of range",
+    "Give way or uncontrolled",
+    "Not at junction or within 20 metres",
+    "Stop sign"
+  ],
+  "junction_detail": [
+    "Crossroads",
+    "Mini-roundabout",
+    "More than 4 arms (not roundabout)",
+    "Not at junction or within 20 metres",
+    "Other junction",
+    "Private drive or entrance",
+    "Roundabout",
+    "Slip road",
+    "T or staggered junction"
+  ],
+  "light_conditions": [
+    "Darkness - lighting unknown",
+    "Darkness - lights lit",
+    "Darkness - lights unlit",
+    "Darkness - no lighting",
+    "Daylight"
+  ],
+  "road_surface_conditions": [
+    "Dry",
+    "Flood over 3cm. deep",
+    "Frost or ice",
+    "Snow",
+    "Unknown",
+    "Wet or damp"
+  ],
+  "road_types": [
+    "Dual carriageway",
+    "One way street",
+    "Roundabout",
+    "Single carriageway",
+    "Slip road",
+    "Unknown"
+  ],
+  "urban_or_rural_area": [
+    "Rural",
+    "Urban"
+  ],
+  "weather_conditions": [
+    "Fine + high winds",
+    "Fine no high winds",
+    "Fog or mist",
+    "Other",
+    "Raining + high winds",
+    "Raining no high winds",
+    "Snowing + high winds",
+    "Snowing no high winds",
+    "Unknown"
+  ],
+  "vehicle_types": [
+    "Agricultural vehicle",
+    "Bus or coach (17 or more pass seats)",
+    "Car",
+    "Goods 7.5 tonnes mgw and over",
+    "Goods over 3.5t. and under 7.5t",
+    "Minibus (8 - 16 passenger seats)",
+    "Motorcycle 125cc and under",
+    "Motorcycle 50cc and under",
+    "Motorcycle over 125cc and up to 500cc",
+    "Motorcycle over 500cc",
+    "Other vehicle",
+    "Pedal cycle",
+    "Ridden horse",
+    "Taxi/Private hire car",
+    "Van / Goods 3.5 tonnes mgw or under"
+  ],
+  "speed_limits": [
+    10,
+    15,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70
+  ]
+}

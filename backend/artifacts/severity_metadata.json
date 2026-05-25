@@ -1,0 +1,22 @@
+{
+  "accuracy": 0.8502,
+  "f1_weighted": 0.7874,
+  "train_rows": 96000,
+  "test_rows": 24000,
+  "features": [
+    "Month",
+    "Day_of_Week",
+    "Junction_Control",
+    "Junction_Detail",
+    "Light_Conditions",
+    "Road_Surface_Conditions",
+    "Road_Type",
+    "Urban_or_Rural_Area",
+    "Weather_Conditions",
+    "Vehicle_Type",
+    "Speed_limit",
+    "Number_of_Casualties",
+    "Number_of_Vehicles",
+    "Accident_Hour"
+  ]
+}

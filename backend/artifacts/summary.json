@@ -1,0 +1,44 @@
+{
+  "total_accidents": 307973,
+  "average_casualties": 1.36,
+  "average_vehicles": 1.83,
+  "severity_counts": {
+    "Fatal": 3953,
+    "Serious": 40740,
+    "Slight": 263280
+  },
+  "weather_counts": {
+    "Fine no high winds": 244496,
+    "Raining no high winds": 34877,
+    "Other": 8802,
+    "Unknown": 6057,
+    "Snowing no high winds": 4839
+  },
+  "road_type_counts": {
+    "Single carriageway": 230612,
+    "Dual carriageway": 45467,
+    "Roundabout": 20929,
+    "One way street": 6197,
+    "Slip road": 3234
+  },
+  "vehicle_type_counts": {
+    "Car": 239794,
+    "Van / Goods 3.5 tonnes mgw or under": 15695,
+    "Motorcycle over 500cc": 11226,
+    "Bus or coach (17 or more pass seats)": 8686,
+    "Motorcycle 125cc and under": 6852
+  },
+  "urban_rural_counts": {
+    "Urban": 198532,
+    "Rural": 109441
+  },
+  "day_of_week_counts": {
+    "Monday": 43918,
+    "Tuesday": 46386,
+    "Wednesday": 46381,
+    "Thursday": 45649,
+    "Friday": 50529,
+    "Saturday": 41566,
+    "Sunday": 33544
+  }
+}

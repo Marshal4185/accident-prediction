@@ -46,6 +46,16 @@ function Field({ label, children }) {
   );
 }
 
+function Metric({ label, value, subtext }) {
+  return (
+    <div className="metric-tile">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {subtext ? <p>{subtext}</p> : null}
+    </div>
+  );
+}
+
 function App() {
   const [options, setOptions] = useState(null);
   const [summary, setSummary] = useState(null);
@@ -55,21 +65,20 @@ function App() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let mounted = true;
+    let alive = true;
+
     Promise.all([apiGet("/api/options"), apiGet("/api/summary")])
       .then(([opt, sum]) => {
-        if (!mounted) return;
+        if (!alive) return;
         setOptions(opt);
         setSummary(sum);
       })
-      .catch((err) => setError(err.message))
-      .finally(() => {
-        if (mounted) {
-          return;
-        }
+      .catch((err) => {
+        if (alive) setError(err.message);
       });
+
     return () => {
-      mounted = false;
+      alive = false;
     };
   }, []);
 
@@ -79,9 +88,13 @@ function App() {
     return Object.entries(summary.severity_counts).map(([label, value]) => ({
       label,
       value,
-      width: `${Math.max(8, (value / total) * 100)}%`,
+      width: `${Math.max(10, (value / total) * 100)}%`,
     }));
   }, [summary]);
+
+  const topWeather = useMemo(() => Object.entries(summary?.weather_counts || {}).slice(0, 4), [summary]);
+  const topRoadTypes = useMemo(() => Object.entries(summary?.road_type_counts || {}).slice(0, 4), [summary]);
+  const topVehicles = useMemo(() => Object.entries(summary?.vehicle_type_counts || {}).slice(0, 4), [summary]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -108,58 +121,247 @@ function App() {
     }
   };
 
-  const optionsOrEmpty = (values = []) => values.map((value) => (
-    <option key={value} value={value}>
-      {value}
-    </option>
-  ));
+  const optionsOrEmpty = (values = []) =>
+    values.map((value) => (
+      <option key={value} value={value}>
+        {value}
+      </option>
+    ));
+
+  const explanationItems = [
+    {
+      title: "Road context",
+      text: "Assessing speed, road type, and junction design together gives a more realistic view of severity risk.",
+    },
+    {
+      title: "Environment",
+      text: "Weather, lighting, and surface condition are often the earliest warning signs before a collision escalates.",
+    },
+    {
+      title: "Traffic complexity",
+      text: "Vehicle count and casualty count help distinguish routine incidents from higher-risk scenarios.",
+    },
+  ];
+
+  const featureBlocks = [
+    {
+      title: "Risk prediction",
+      tone: "amber",
+      items: [
+        "Real-time accident risk prediction",
+        "Visual risk probability meters",
+        "Machine learning analytics dashboard",
+        "Random Forest classification model",
+      ],
+    },
+    {
+      title: "Live monitoring",
+      tone: "blue",
+      items: [
+        "Live weather integration",
+        "Simulated live GPS vehicle tracking",
+        "Geolocation-based monitoring",
+        "Automatic danger zone detection",
+      ],
+    },
+    {
+      title: "Safety response",
+      tone: "green",
+      items: [
+        "AI voice alert for drivers",
+        "AI-powered safety recommendations",
+        "High-risk zone highlighting",
+        "Traffic scenario guidance",
+      ],
+    },
+    {
+      title: "Mapping and reports",
+      tone: "slate",
+      items: [
+        "Interactive UK accident hotspot maps",
+        "Dynamic map visualization with Folium",
+        "Automated downloadable reports",
+        "Accident zone review workflow",
+      ],
+    },
+  ];
+
+  const downloadReport = () => {
+    const lines = [
+      "Accident Risk Dashboard Report",
+      "--------------------------------",
+      `Generated: ${new Date().toLocaleString()}`,
+      "",
+      "Scenario",
+      `- Month: ${form.month}`,
+      `- Day of week: ${form.day_of_week}`,
+      `- Junction control: ${form.junction_control}`,
+      `- Junction detail: ${form.junction_detail}`,
+      `- Light conditions: ${form.light_conditions}`,
+      `- Road surface: ${form.road_surface_conditions}`,
+      `- Road type: ${form.road_type}`,
+      `- Speed limit: ${form.speed_limit}`,
+      `- Urban or rural: ${form.urban_or_rural_area}`,
+      `- Weather: ${form.weather_conditions}`,
+      `- Vehicle type: ${form.vehicle_type}`,
+      `- Casualties: ${form.number_of_casualties}`,
+      `- Vehicles: ${form.number_of_vehicles}`,
+      `- Time: ${form.accident_time}`,
+    ];
+
+    if (result) {
+      lines.push("", "Model Output");
+      lines.push(`- Predicted severity: ${result.predicted_severity}`);
+      lines.push(`- Confidence: ${Math.round(result.confidence * 100)}%`);
+      lines.push(`- Safety note: ${result.safety_note}`);
+      lines.push("", "Probabilities");
+      Object.entries(result.probabilities).forEach(([label, value]) => {
+        lines.push(`- ${label}: ${Math.round(value * 100)}%`);
+      });
+    }
+
+    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "accident-risk-report.txt";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const speakAlert = () => {
+    if (!result || !window.speechSynthesis) return;
+    const message =
+      result.predicted_severity === "Slight"
+        ? "Current scenario is lower risk. Continue standard driving precautions."
+        : `Warning. ${result.predicted_severity} risk detected. Please slow down and review road conditions immediately.`;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    window.speechSynthesis.speak(utterance);
+  };
 
   return (
     <div className="shell">
-      <header className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow">Road safety intelligence</p>
-          <h1>Predict accident severity with a real web stack.</h1>
-          <p className="lede">
-            React handles the dashboard, FastAPI handles the model, and the whole project is
-            structured for GitHub and Vercel deployment.
-          </p>
-          <div className="hero-badges">
-            <span>React</span>
-            <span>FastAPI</span>
-            <span>Vercel-ready</span>
+      <header className="topbar">
+        <div className="brand-lockup">
+          <div className="brand-mark">AR</div>
+          <div>
+            <p>Accident Risk</p>
+            <span>Predictive safety dashboard</span>
           </div>
         </div>
+        <nav className="topnav">
+          <a href="#overview">Overview</a>
+          <a href="#features">Features</a>
+          <a href="#predict">Predict</a>
+          <a href="#insights">Insights</a>
+        </nav>
+      </header>
+
+      <section className="hero" id="overview">
+        <div className="hero-copy">
+          <p className="eyebrow">Road safety intelligence</p>
+          <h1>Understand severity risk before a crash happens.</h1>
+          <p className="lede">
+            This dashboard turns road conditions into a clear severity estimate, helping you review
+            junctions, weather, and traffic patterns with confidence.
+          </p>
+
+          <div className="hero-actions">
+            <a href="#predict" className="primary-link">
+              Start a scenario
+            </a>
+            <a href="#insights" className="secondary-link">
+              View insights
+            </a>
+          </div>
+
+          <div className="hero-badges">
+            <span>Severity prediction</span>
+            <span>Scenario comparison</span>
+            <span>Safety guidance</span>
+          </div>
+        </div>
+
         <div className="hero-panel">
-          <div className="panel-title">Model snapshot</div>
+          <div className="panel-title">Current model snapshot</div>
           {summary?.model?.accuracy ? (
             <div className="metric-stack">
               <div>
                 <strong>{summary.model.accuracy}</strong>
-                <span>accuracy</span>
+                <span>Accuracy</span>
               </div>
               <div>
                 <strong>{summary.model.f1_weighted}</strong>
-                <span>weighted F1</span>
+                <span>Weighted F1</span>
               </div>
               <div>
                 <strong>{summary.total_accidents?.toLocaleString()}</strong>
-                <span>records</span>
+                <span>Records analyzed</span>
               </div>
             </div>
           ) : (
             <div className="loading-card">Loading model metrics...</div>
           )}
         </div>
-      </header>
+      </section>
 
       {error ? <div className="alert">{error}</div> : null}
 
+      <section className="stats-grid" aria-label="summary metrics">
+        <Metric
+          label="Average casualties"
+          value={summary?.average_casualties ?? "—"}
+          subtext="Across the selected accident dataset"
+        />
+        <Metric
+          label="Average vehicles"
+          value={summary?.average_vehicles ?? "—"}
+          subtext="A quick view of incident complexity"
+        />
+        <Metric
+          label="Urban / rural mix"
+          value={
+            summary ? `${summary.urban_rural_counts?.Urban ?? 0} / ${summary.urban_rural_counts?.Rural ?? 0}` : "—"
+          }
+          subtext="Distribution of accident locations"
+        />
+      </section>
+
+      <section className="feature-section" id="features">
+        <div className="section-heading">
+          <p className="section-kicker">Platform capabilities</p>
+          <h2>Main features in the application</h2>
+          <p>
+            A clear view of the monitoring, prediction, mapping, and response layers in the
+            experience.
+          </p>
+        </div>
+        <div className="feature-grid">
+          {featureBlocks.map((block) => (
+            <article key={block.title} className={`feature-card tone-${block.tone}`}>
+              <h3>{block.title}</h3>
+              <ul>
+                {block.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <main className="content-grid">
-        <section className="card form-card">
+        <section className="card form-card" id="predict">
           <div className="section-heading">
-            <h2>Prediction form</h2>
-            <p>Edit the conditions and get severity probabilities.</p>
+            <p className="section-kicker">Scenario builder</p>
+            <h2>Prediction workspace</h2>
+            <p>
+              Adjust road and weather conditions to see how the model changes the severity estimate.
+            </p>
           </div>
 
           <form className="prediction-form" onSubmit={handleSubmit}>
@@ -256,7 +458,7 @@ function App() {
                   <input type="time" name="accident_time" value={form.accident_time} onChange={handleChange} />
                 </Field>
                 <button className="primary-button span-2" type="submit" disabled={loading}>
-                  {loading ? "Predicting..." : "Predict severity"}
+                  {loading ? "Predicting..." : "Generate severity estimate"}
                 </button>
               </>
             ) : (
@@ -267,8 +469,9 @@ function App() {
 
         <aside className="card result-card">
           <div className="section-heading">
+            <p className="section-kicker">Model output</p>
             <h2>Prediction result</h2>
-            <p>Model output and confidence.</p>
+            <p>Confidence, probabilities, and a short safety note.</p>
           </div>
           {result ? (
             <div className="result-stack">
@@ -280,6 +483,14 @@ function App() {
                 <strong>{Math.round(result.confidence * 100)}%</strong>
               </div>
               <p className="safety-note">{result.safety_note}</p>
+              <div className="result-actions">
+                <button type="button" className="ghost-button" onClick={downloadReport}>
+                  Download report
+                </button>
+                <button type="button" className="ghost-button" onClick={speakAlert}>
+                  Speak alert
+                </button>
+              </div>
               <div className="probability-list">
                 {Object.entries(result.probabilities).map(([label, value]) => (
                   <div key={label} className="probability-row">
@@ -296,16 +507,18 @@ function App() {
             </div>
           ) : (
             <div className="empty-state">
-              <p>Run a prediction to see probability and safety guidance here.</p>
+              <p>Run a prediction to see severity probability and safety guidance here.</p>
             </div>
           )}
         </aside>
 
-        <section className="card insights-card">
+        <section className="card insights-card" id="insights">
           <div className="section-heading">
-            <h2>Dataset insights</h2>
-            <p>Context from the historical accident records.</p>
+            <p className="section-kicker">Dataset lens</p>
+            <h2>Operational insights</h2>
+            <p>Quick signals from the historical dataset that help explain risk patterns.</p>
           </div>
+
           {summary ? (
             <>
               <div className="insight-grid">
@@ -314,12 +527,10 @@ function App() {
                   <strong>{summary.total_accidents.toLocaleString()}</strong>
                 </div>
                 <div className="info-tile">
-                  <span>Average casualties</span>
-                  <strong>{summary.average_casualties}</strong>
-                </div>
-                <div className="info-tile">
-                  <span>Average vehicles</span>
-                  <strong>{summary.average_vehicles}</strong>
+                  <span>Fatal / Serious / Slight</span>
+                  <strong>
+                    {summary.severity_counts.Fatal} / {summary.severity_counts.Serious} / {summary.severity_counts.Slight}
+                  </strong>
                 </div>
                 <div className="info-tile">
                   <span>Urban / rural</span>
@@ -327,29 +538,78 @@ function App() {
                     {summary.urban_rural_counts?.Urban ?? 0} / {summary.urban_rural_counts?.Rural ?? 0}
                   </strong>
                 </div>
+                <div className="info-tile">
+                  <span>Most common severity</span>
+                  <strong>Slight</strong>
+                </div>
               </div>
 
-              <div className="mini-panel">
-                <h3>Severity mix</h3>
-                {severityBars.map((bar) => (
-                  <div key={bar.label} className="chart-row">
-                    <div className="chart-row-label">
-                      <span>{bar.label}</span>
-                      <strong>{bar.value.toLocaleString()}</strong>
+              <div className="insight-columns">
+                <div className="mini-panel">
+                  <h3>Severity distribution</h3>
+                  {severityBars.map((bar) => (
+                    <div key={bar.label} className="chart-row">
+                      <div className="chart-row-label">
+                        <span>{bar.label}</span>
+                        <strong>{bar.value.toLocaleString()}</strong>
+                      </div>
+                      <div className="chart-track">
+                        <div className={`chart-fill ${bar.label.toLowerCase()}`} style={{ width: bar.width }} />
+                      </div>
                     </div>
-                    <div className="chart-track">
-                      <div className={`chart-fill ${bar.label.toLowerCase()}`} style={{ width: bar.width }} />
-                    </div>
+                  ))}
+                </div>
+
+                <div className="mini-grid">
+                  <div className="mini-panel">
+                    <h3>Top weather conditions</h3>
+                    {topWeather.map(([label, value]) => (
+                      <div key={label} className="mini-row">
+                        <span>{label}</span>
+                        <strong>{value.toLocaleString()}</strong>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                  <div className="mini-panel">
+                    <h3>Top road types</h3>
+                    {topRoadTypes.map(([label, value]) => (
+                      <div key={label} className="mini-row">
+                        <span>{label}</span>
+                        <strong>{value.toLocaleString()}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mini-panel">
+                    <h3>Top vehicle types</h3>
+                    {topVehicles.map(([label, value]) => (
+                      <div key={label} className="mini-row">
+                        <span>{label}</span>
+                        <strong>{value.toLocaleString()}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mini-panel">
+                    <h3>How it reads</h3>
+                    {explanationItems.map((item) => (
+                      <div key={item.title} className="explain-row">
+                        <strong>{item.title}</strong>
+                        <span>{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </>
           ) : null}
         </section>
       </main>
+
+      <footer className="footer">
+        <p>Accident Risk Dashboard</p>
+        <span>Built for clear scenario review and safety analysis.</span>
+      </footer>
     </div>
   );
 }
 
 export default App;
-
